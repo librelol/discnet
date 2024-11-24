@@ -6,7 +6,8 @@ const authMiddleware = require('../middlewares/authMiddleware');
 
 const WORKERS_API_URL = process.env.WORKERS_API_URL || 'http://workersapi:4000';
 
-rrouter.post('/start', authMiddleware, async (req, res) => {
+// Great
+router.post('/start', authMiddleware, async (req, res) => {
   try {
     const userId = req.user.id; // Extract user ID from the authenticated user
     const jobData = { ...req.body, user_id: userId }; // Include user ID in the job data
