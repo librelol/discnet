@@ -12,7 +12,7 @@ dotenv.config();
 const app = express();
 
 // Define allowed origins
-const allowedOrigins = ['http://localhost:3000', 'http://discnet.libre.lol'];
+const allowedOrigins = ['http://localhost:3000', 'https://discnet.libre.lol'];
 
 const corsOptions = {
   origin: function (origin, callback) {
