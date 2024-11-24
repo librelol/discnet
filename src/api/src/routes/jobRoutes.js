@@ -4,7 +4,7 @@ const router = express.Router();
 const Job = require('../models/jobModel');
 const authMiddleware = require('../middlewares/authMiddleware');
 
-const WORKERS_API_URL = 'http://workersapi_container:4000';
+const WORKERS_API_URL = 'http://workersapi:4000';
 
 router.post('/start', authMiddleware, async (req, res) => {
   try {

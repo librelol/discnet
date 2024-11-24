@@ -9,6 +9,7 @@ services:
     environment:
       - POSTGRES_URI=postgres://postgres:greatguy@postgres:5432/discnet
       - JWT_SECRET=hjo2h032hjdjh0j320hh32
+      - WORKERS_API_URL=http://workersapi:4000
       - PORT=5000
     depends_on:
       postgres:
