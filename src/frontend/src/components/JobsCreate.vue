@@ -42,8 +42,8 @@ export default {
     return {
       discordToken: '',
       channelIds: '',
-      replyPrompt: '',
-      personalityPrompt: '',
+      replyPrompt: 'Default reply prompt',
+      personalityPrompt: 'Default personality prompt',
     };
   },
   methods: {

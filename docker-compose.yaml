@@ -7,7 +7,7 @@ services:
     ports:
       - "5000:5000"
     environment:
-      - SERVICE_FQDN_APIDISC=https://apiddisc.libre.lol
+      - SERVICE_FQDN_APIDISC_5000=https://apiddisc.libre.lol
       - POSTGRES_URI=postgres://postgres:greatguy@postgres:5432/discnet
       - JWT_SECRET=hjo2h032hjdjh0j320hh32
       - PORT=5000
@@ -23,7 +23,7 @@ services:
     build: ./src/frontend
     container_name: frontend_container
     environment:
-      - SERVICE_FQDN_DISC=https://discnet.libre.lol
+      - SERVICE_FQDN_DISC_3000=https://discnet.libre.lol
     ports:
       - "3000:3000"
     networks:
