@@ -10,7 +10,7 @@ def fetch_user_id(headers):
         return None
 
 def fetch_messages(channel_id, headers, since_message_id=None):
-    url = f"https://discord.com/api/v9/channels/{channel_id}/messages?limit=2"
+    url = f"https://discord.com/api/v9/channels/{channel_id}/messages?limit=5"
     if since_message_id:
         url += f"&before={since_message_id}"
 
