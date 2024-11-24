@@ -6,7 +6,6 @@ const authMiddleware = require('../middlewares/authMiddleware');
 
 const WORKERS_API_URL = process.env.WORKERS_API_URL || 'http://workersapi:4000';
 
-// Great
 router.post('/start', authMiddleware, async (req, res) => {
   try {
     const userId = req.user.id; // Extract user ID from the authenticated user
@@ -65,7 +64,7 @@ router.get('/status/:job_id', authMiddleware, async (req, res) => {
 
 router.get('/owned', authMiddleware, async (req, res) => {
   try {
-    const jobs = await Job.findAll({ where: { userId: req.user.userId } });
+    const jobs = await Job.findAll({ where: { userId: req.user.id } });
     res.status(200).json(jobs);
   } catch (error) {
     res.status(500).json({ message: error.message });
