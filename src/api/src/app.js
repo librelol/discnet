@@ -12,7 +12,7 @@ dotenv.config();
 const app = express();
 
 // Define allowed origins
-const allowedOrigins = ['https://discnet.libre.lol', 'https://apidisc.libre.lol', 'http://discnet.libre.lol', 'localhost:3000'];
+const allowedOrigins = ['https://discnet.libre.lol', 'https://apidisc.libre.lol', 'http://discnet.libre.lol', 'http://localhost:3000'];
 
 const corsOptions = {
   origin: function (origin, callback) {
@@ -22,15 +22,14 @@ const corsOptions = {
       return callback(new Error(msg), false);
     }
     return callback(null, true);
-  }
+  },
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token'],
+  credentials: true,
+  optionsSuccessStatus: 200,
 };
 
 app.use(cors(corsOptions)); // Enable CORS with options
-
-connectDB();
-
-// Sync models with the database
-sequelize.sync();
 
 // Middleware
 app.use(express.json());
