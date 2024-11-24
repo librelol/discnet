@@ -88,11 +88,11 @@ def monitor_and_reply(job_id, config):
 
         time.sleep(1)
 
-@app.route("/job/owned/<int:user_id>", methods=["GET"])
-def list_owned_jobs(user_id):
+@app.route("/job/owned/<string:username>", methods=["GET"])
+def list_owned_jobs(username):
     """List jobs owned by a specific user."""
-    user_jobs = [job_id for job_id, job in jobs.items() if job['user_id'] == user_id]
-    return jsonify({"user_id": user_id, "jobs": user_jobs}), 200
+    user_jobs = [job_id for job_id, job in jobs.items() if job['username'] == username]
+    return jsonify({"username": username, "jobs": user_jobs}), 200
 
 @app.route("/job/start", methods=["POST"])
 def start_job():
@@ -100,10 +100,10 @@ def start_job():
     global job_counter
 
     try:
-        # Extract user ID from the request
-        user_id = request.json.get('user_id')
-        if not user_id:
-            return jsonify({"status": "error", "message": "User ID is required"}), 400
+        # Extract username from the request
+        username = request.json.get('username')
+        if not username:
+            return jsonify({"status": "error", "message": "Username is required"}), 400
 
         # Create a unique job ID and directory for the new job
         job_id = job_counter
@@ -127,7 +127,7 @@ def start_job():
 
         # Create job thread and start bot
         jobs[job_id] = {
-            'user_id': user_id,
+            'username': username,
             'is_running': True,
             'is_paused': False,
             'message_count': 0,

@@ -8,11 +8,11 @@ const WORKERS_API_URL = process.env.WORKERS_API_URL || 'http://workersapi:4000';
 
 router.post('/start', authMiddleware, async (req, res) => {
   try {
-    const userId = req.user.id; // Extract user ID from the authenticated user
-    const jobData = { ...req.body, user_id: userId }; // Include user ID in the job data
+    const username = req.user.username; // Extract username from the authenticated user
+    const jobData = { ...req.body, username: username }; // Include username in the job data
     console.log('Job start request data:', jobData); // Log the request data
     const response = await axios.post(`${WORKERS_API_URL}/job/start`, jobData);
-    const job = await Job.create({ userId: userId, status: 'running' });
+    const job = await Job.create({ userId: req.user.id, status: 'running' });
     res.status(response.status).json({ ...response.data, jobId: job.jobId });
   } catch (error) {
     console.error('Error starting job:', error);
@@ -64,9 +64,12 @@ router.get('/status/:job_id', authMiddleware, async (req, res) => {
 
 router.get('/owned', authMiddleware, async (req, res) => {
   try {
+    console.log('Fetching jobs for user:', req.user.username); // Log the username
     const jobs = await Job.findAll({ where: { userId: req.user.id } });
+    console.log('Fetched jobs:', jobs); // Log the fetched jobs
     res.status(200).json(jobs);
   } catch (error) {
+    console.error('Error fetching jobs:', error); // Log the error
     res.status(500).json({ message: error.message });
   }
 });

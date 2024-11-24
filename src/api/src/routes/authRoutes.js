@@ -15,7 +15,7 @@ router.post('/register', async (req, res) => {
     }
     user = new User({ name, email, password });
     await user.save();
-    const payload = { userId: user.id };
+    const payload = { id: user.id, username: user.name }; // Ensure the payload contains the correct user ID and username
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
     res.status(201).json({ token });
   } catch (err) {
@@ -35,7 +35,7 @@ router.post('/login', async (req, res) => {
     if (!isMatch) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
-    const payload = { userId: user.id };
+    const payload = { id: user.id, username: user.name }; // Ensure the payload contains the correct user ID and username
     const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
     res.status(200).json({ token });
   } catch (err) {
