@@ -60,13 +60,11 @@ router.get('/status/:job_id', authMiddleware, async (req, res) => {
   }
 });
 
-// New route to list jobs owned by the authenticated user
 router.get('/owned', authMiddleware, async (req, res) => {
   try {
-    const jobs = await Job.findAll({ where: { userId: req.user.id } });
+    const jobs = await Job.findAll({ where: { userId: req.user.userId } });
     res.status(200).json(jobs);
   } catch (error) {
-    console.error('Error fetching owned jobs:', error);
     res.status(500).json({ message: error.message });
   }
 });

@@ -41,16 +41,15 @@ export default {
   },
   async created() {
     try {
-      const userId = localStorage.getItem('user_id'); // Assuming user ID is stored in local storage
       const token = localStorage.getItem('token');
       console.log('Token:', token);
-      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/job/owned/${userId}`, {
+      const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/job/owned`, {
         headers: {
           'x-auth-token': token,
         },
       });
       console.log('Jobs response data:', response.data);
-      this.jobs = response.data.jobs;
+      this.jobs = response.data;
     } catch (error) {
       console.error('Error fetching jobs:', error);
     } finally {
