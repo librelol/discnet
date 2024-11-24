@@ -155,5 +155,5 @@ def job_status(job_id):
 
 if __name__ == "__main__":
 
-    os.system("curl -X POST http://ollama-api:11434/api/models/pull -d '{\"model\": \"llama3.2\"}'")
+    os.system("curl -X POST http://ollama-api:11434/api/pull -d '{\"model\": \"llama3.2\"}'")
     app.run(debug=True, host="0.0.0.0", port=4000)
