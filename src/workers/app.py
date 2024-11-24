@@ -77,11 +77,9 @@ def monitor_and_reply(job_id, config):
 
                     # Try replying, if the reply gets blocked, regenerate the reply
                     success = reply_to_message(channel_id, message_id, reply_content, headers)
-                    while not success:
-                        reply_content = generate_reply(content, personality_prompt, reply_prompt, model_name, ollama_api_url)
-                        reply_content = reply_content.replace("\"\"", "").strip()
-                        print(f"Regenerated reply for message ID {message_id}: {reply_content}")
-                        success = reply_to_message(channel_id, message_id, reply_content, headers)
+                    if not success:
+                        print(f"Error replying to message ID {message_id}. Skipping this message.")
+                        continue
 
                     replied_message_ids.add(message_id)
                     jobs[job_id]['message_count'] += 1

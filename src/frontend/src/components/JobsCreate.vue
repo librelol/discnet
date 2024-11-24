@@ -42,8 +42,8 @@ export default {
     return {
       discordToken: '',
       channelIds: '',
-      replyPrompt: 'Default reply prompt',
-      personalityPrompt: 'Default personality prompt',
+      replyPrompt: 'Reply in a manor as if you are being talked to. You shalll only just reply and not add notes to any of the messages.',
+      personalityPrompt: 'Be a nice and information person but keeping it short and sweet.',
     };
   },
   methods: {
