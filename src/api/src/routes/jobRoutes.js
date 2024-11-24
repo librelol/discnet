@@ -64,6 +64,7 @@ router.get('/owned', authMiddleware, async (req, res) => {
     const jobs = await Job.findAll({ where: { userId: req.user.id } });
     res.status(200).json(jobs);
   } catch (error) {
+    console.error('Error fetching owned jobs:', error);
     res.status(500).json({ message: error.message });
   }
 });
