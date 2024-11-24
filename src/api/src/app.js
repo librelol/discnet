@@ -12,7 +12,7 @@ dotenv.config();
 const app = express();
 
 // Define allowed origins
-const allowedOrigins = ['https://discnet.libre.lol', 'https://apidisc.libre.lol', 'http://discnet.libre.lol', 'http://localhost:3000'];
+const allowedOrigins = ['*'];
 
 const corsOptions = {
   origin: function (origin, callback) {
@@ -28,6 +28,8 @@ const corsOptions = {
   credentials: true,
   optionsSuccessStatus: 200,
 };
+
+app.options('*', cors(corsOptions)); // Preflight requests
 
 app.use(cors(corsOptions)); // Enable CORS with options
 
