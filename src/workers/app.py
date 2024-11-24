@@ -20,7 +20,7 @@ def monitor_and_reply(job_id, config):
     global jobs
 
     job = jobs[job_id]
-    user_id = job['user_id']
+    username = job['username']
     discord_token = config.get("discord_token")
     channel_ids = config.get("channel_ids", [])  # List of channels
     ollama_api_url = os.getenv("OLLAMA_API_URL", "http://ollama-api:11434/api/generate")
