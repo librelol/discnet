@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+  api:
+    build: ./src/api
+    container_name: api_container
+    ports:
+      - "5000:5000"
+    environment:
+      - SERVICE_FQDN_APIDISC=https://apiddisc.libre.lol
+      - POSTGRES_URI=postgres://postgres:greatguy@postgres:5432/discnet
+      - JWT_SECRET=hjo2h032hjdjh0j320hh32
+      - PORT=5000
+    depends_on:
+      postgres:
+        condition: service_healthy
+      workersapi:
+        condition: service_started
+    networks:
+      - discnet_network
+
+  frontend:
+    build: ./src/frontend
+    container_name: frontend_container
+    environment:
+      - SERVICE_FQDN_DISC=https://discnet.libre.lol
+    ports:
+      - "3000:3000"
+    networks:
+      - discnet_network
+
+  workersapi:
+    build: ./src/workers
+    container_name: workersapi
+    environment:
+      - OLLAMA_API=http://ollama-api:11434
+    depends_on:
+      ollama-api:
+        condition: service_started
+    networks:
+      - discnet_network
+
+  ollama-api:
+    image: 'ollama/ollama:latest'
+    container_name: ollama-api
+    volumes:
+      - 'ollama:/root/.ollama'
+    networks:
+      - discnet_network
+    environment:
+      - OLLAMA_KEEP_ALIVE=24h
+      - OLLAMA_HOST=0.0.0.0
+    healthcheck:
+      test:
+        - CMD
+        - ollama
+        - list
+      interval: 30s
+      timeout: 30s
+      retries: 10
+
+  postgres:
+    image: postgres:latest
+    container_name: postgres_container
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=greatguy
+      - POSTGRES_DB=discnet
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - discnet_network
+
+networks:
+  discnet_network:
+    driver: bridge
+
+volumes:
+  ollama:
+  postgres_data:
