@@ -19,6 +19,8 @@ job_counter = 1  # Counter for unique job IDs
 def monitor_and_reply(job_id, config):
     global jobs
 
+    job = jobs[job_id]
+    user_id = job['user_id']
     discord_token = config.get("discord_token")
     channel_ids = config.get("channel_ids", [])  # List of channels
     ollama_api_url = os.getenv("OLLAMA_API_URL", "http://ollama-api:11434/api/generate")
@@ -86,12 +88,23 @@ def monitor_and_reply(job_id, config):
 
         time.sleep(1)
 
+@app.route("/job/owned/<int:user_id>", methods=["GET"])
+def list_owned_jobs(user_id):
+    """List jobs owned by a specific user."""
+    user_jobs = [job_id for job_id, job in jobs.items() if job['user_id'] == user_id]
+    return jsonify({"user_id": user_id, "jobs": user_jobs}), 200
+
 @app.route("/job/start", methods=["POST"])
 def start_job():
     """Start a new job with a unique job configuration."""
     global job_counter
 
     try:
+        # Extract user ID from the request
+        user_id = request.json.get('user_id')
+        if not user_id:
+            return jsonify({"status": "error", "message": "User ID is required"}), 400
+
         # Create a unique job ID and directory for the new job
         job_id = job_counter
         job_counter += 1
@@ -114,6 +127,7 @@ def start_job():
 
         # Create job thread and start bot
         jobs[job_id] = {
+            'user_id': user_id,
             'is_running': True,
             'is_paused': False,
             'message_count': 0,

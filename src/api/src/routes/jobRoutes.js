@@ -6,10 +6,12 @@ const authMiddleware = require('../middlewares/authMiddleware');
 
 const WORKERS_API_URL = process.env.WORKERS_API_URL || 'http://workersapi:4000';
 
-router.post('/start', authMiddleware, async (req, res) => {
+rrouter.post('/start', authMiddleware, async (req, res) => {
   try {
-    const response = await axios.post(`${WORKERS_API_URL}/job/start`, req.body);
-    const job = await Job.create({ userId: req.user.id, status: 'running' });
+    const userId = req.user.id; // Extract user ID from the authenticated user
+    const jobData = { ...req.body, user_id: userId }; // Include user ID in the job data
+    const response = await axios.post(`${WORKERS_API_URL}/job/start`, jobData);
+    const job = await Job.create({ userId: userId, status: 'running' });
     res.status(response.status).json({ ...response.data, jobId: job.jobId });
   } catch (error) {
     res.status(error.response ? error.response.status : 500).json({ message: error.message });
