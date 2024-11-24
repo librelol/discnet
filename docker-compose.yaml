@@ -4,8 +4,6 @@ services:
   api:
     build: ./src/api
     container_name: api_container
-    ports:
-      - "5000:5000"
     environment:
       - SERVICE_FQDN_APIDISC_5000=https://apiddisc.libre.lol
       - POSTGRES_URI=postgres://postgres:greatguy@postgres:5432/discnet
@@ -24,8 +22,6 @@ services:
     container_name: frontend_container
     environment:
       - SERVICE_FQDN_DISC_3000=https://discnet.libre.lol
-    ports:
-      - "3000:3000"
     networks:
       - discnet_network
 
