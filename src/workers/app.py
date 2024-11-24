@@ -1,5 +1,7 @@
 import time
 import os
+import requests
+
 from threading import Thread
 from flask import Flask, jsonify, request
 from config_handler import load_config, check_for_config_changes
@@ -19,8 +21,8 @@ def monitor_and_reply(job_id, config):
 
     discord_token = config.get("discord_token")
     channel_ids = config.get("channel_ids", [])  # List of channels
-    ollama_api_url = "http://ollama-api:11434/api/generate"
-    model_name = "llama3.2"
+    ollama_api_url = os.getenv("OLLAMA_API_URL", "http://ollama-api:11434/api/generate")
+    model_name = os.getenv("MODEL_NAME", "llama3.2")
     reply_prompt = config.get("reply_prompt", "")
     personality_prompt = config.get("personality_prompt", "")
     log_file_path = f"jobs/job_{job_id}/logs/user_messages_log.json"
@@ -89,36 +91,40 @@ def start_job():
     """Start a new job with a unique job configuration."""
     global job_counter
 
-    # Create a unique job ID and directory for the new job
-    job_id = job_counter
-    job_counter += 1
-    
-    job_config_path = f"jobs/job_{job_id}/config.yaml"
-    
-    if not os.path.exists(f"jobs/job_{job_id}"):
-        os.makedirs(f"jobs/job_{job_id}")
+    try:
+        # Create a unique job ID and directory for the new job
+        job_id = job_counter
+        job_counter += 1
+        
+        job_config_path = f"jobs/job_{job_id}/config.yaml"
+        
+        if not os.path.exists(f"jobs/job_{job_id}"):
+            os.makedirs(f"jobs/job_{job_id}")
 
-    # Load static configuration
-    static_config = load_config("config.yaml")
+        # Load static configuration
+        static_config = load_config("config.yaml")
 
-    # Get dynamic configuration from request
-    dynamic_config = request.json
-    config = {**static_config, **dynamic_config}
+        # Get dynamic configuration from request
+        dynamic_config = request.json
+        config = {**static_config, **dynamic_config}
 
-    # Add fixed values for ollama_api_url and model_name
-    config["ollama_api_url"] = "http://ollama-api:11434/api/generate"
-    config["model_name"] = "llama3.2"
+        # Add fixed values for ollama_api_url and model_name
+        config["ollama_api_url"] = "http://ollama-api:11434/api/generate"
+        config["model_name"] = "llama3.2"
 
-    # Create job thread and start bot
-    jobs[job_id] = {
-        'is_running': True,
-        'is_paused': False,
-        'message_count': 0,
-        'thread': Thread(target=monitor_and_reply, args=(job_id, config))
-    }
-    jobs[job_id]['thread'].start()
-    
-    return jsonify({"status": f"Job {job_id} started", "job_id": job_id}), 200
+        # Create job thread and start bot
+        jobs[job_id] = {
+            'is_running': True,
+            'is_paused': False,
+            'message_count': 0,
+            'thread': Thread(target=monitor_and_reply, args=(job_id, config))
+        }
+        jobs[job_id]['thread'].start()
+        
+        return jsonify({"status": f"Job {job_id} started", "job_id": job_id}), 200
+    except Exception as e:
+        print(f"Error starting job: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 @app.route("/job/stop/<int:job_id>", methods=["POST"])
 def stop_job(job_id):
@@ -154,6 +160,10 @@ def job_status(job_id):
         return jsonify({"status": f"Job {job_id} not found"}), 404
 
 if __name__ == "__main__":
-
-    os.system("curl -X POST http://ollama-api:11434/api/pull -d '{\"model\": \"llama3.2\"}'")
+    try:
+        response = requests.post("http://ollama-api:11434/api/pull", json={"model": "llama3.2"})
+        response.raise_for_status()
+        print("Model pulled successfully")
+    except requests.exceptions.RequestException as e:
+        print(f"Error pulling model: {e}")
     app.run(debug=True, host="0.0.0.0", port=4000)
