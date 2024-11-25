@@ -32,7 +32,7 @@ services:
     environment:
       - OLLAMA_API=http://ollama-api:11434
     volumes:
-    - 'jobs:/root/jobs'
+    - 'jobs:/app/jobs'
     depends_on:
       ollama-api:
         condition: service_started
