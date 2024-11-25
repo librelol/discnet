@@ -84,8 +84,6 @@ def monitor_and_reply(job_id, config):
                     replied_message_ids.add(message_id)
                     jobs[job_id]['message_count'] += 1
 
-        time.sleep(1)
-
 @app.route("/job/owned/<string:username>", methods=["GET"])
 def list_owned_jobs(username):
     """List jobs owned by a specific user."""
