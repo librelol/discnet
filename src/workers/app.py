@@ -89,7 +89,7 @@ def monitor_and_reply(job_id, config):
 @app.route("/job/owned/<string:username>", methods=["GET"])
 def list_owned_jobs(username):
     """List jobs owned by a specific user."""
-    user_jobs = [job_id for job_id, job in jobs.items() if job['username'] == username]
+    user_jobs = [{"job_id": job_id, "username": job['username']} for job_id, job in jobs.items() if job['username'] == username]
     return jsonify({"username": username, "jobs": user_jobs}), 200
 
 @app.route("/job/start", methods=["POST"])

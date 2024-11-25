@@ -12,9 +12,11 @@ async function syncJobs(userId) {
     // Fetch jobs from workersapi
     const workersApiResponse = await axios.get(`${WORKERS_API_URL}/job/owned/${userId}`);
     const workerJobs = workersApiResponse.data.jobs;
+    console.log('Worker jobs:', workerJobs);
 
     // Fetch jobs from main API
     const mainApiJobs = await Job.findAll({ where: { userId } });
+    console.log('Main API jobs:', mainApiJobs);
 
     // Find jobs that are in the main API but not in the workersapi
     const workerJobIds = new Set(workerJobs.map(job => job.jobId));
