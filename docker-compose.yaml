@@ -31,6 +31,8 @@ services:
     container_name: workersapi
     environment:
       - OLLAMA_API=http://ollama-api:11434
+    volumes:
+    - 'jobs:/root/jobs'
     depends_on:
       ollama-api:
         condition: service_started
@@ -79,4 +81,5 @@ networks:
 
 volumes:
   ollama:
+  jobs:
   postgres_data:
