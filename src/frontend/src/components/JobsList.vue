@@ -30,6 +30,7 @@
 
 <script>
 import axios from 'axios';
+
 export default {
   name: 'JobsList',
   data() {
@@ -45,8 +46,10 @@ export default {
   },
   methods: {
     async fetchJobs() {
+      this.loading = true;
       try {
         const token = localStorage.getItem('token');
+        await this.syncJobs(); // Sync jobs before fetching
         const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/job/owned`, {
           headers: {
             'x-auth-token': token,
@@ -100,6 +103,19 @@ export default {
         this.fetchJobs(); // Refresh the job list
       } catch (error) {
         console.error('Error stopping all jobs:', error.response.data);
+      }
+    },
+    async syncJobs() {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/job/sync`, {}, {
+          headers: {
+            'x-auth-token': token,
+          },
+        });
+        console.log('Jobs synced successfully:', response.data);
+      } catch (error) {
+        console.error('Error syncing jobs:', error.response.data);
       }
     },
   },
