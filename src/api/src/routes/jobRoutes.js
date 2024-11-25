@@ -91,13 +91,23 @@ router.get('/status/:job_id', authMiddleware, async (req, res) => {
 router.get('/owned', authMiddleware, async (req, res) => {
   try {
     console.log('Fetching jobs for user:', req.user.username); // Log the username
-    await syncJobs(req.user.id); // Sync jobs before fetching
     const jobs = await Job.findAll({ where: { userId: req.user.id } });
     console.log('Fetched jobs:', jobs); // Log the fetched jobs
     res.status(200).json(jobs);
   } catch (error) {
     console.error('Error fetching jobs:', error); // Log the error
     res.status(500).json({ message: error.message });
+  }
+});
+
+// New endpoint to manually sync jobs
+router.post('/sync', authMiddleware, async (req, res) => {
+  try {
+    await syncJobs(req.user.id);
+    res.status(200).json({ message: 'Jobs synced successfully' });
+  } catch (error) {
+    console.error('Error syncing jobs:', error);
+    res.status(500).json({ message: 'Error syncing jobs' });
   }
 });
 
