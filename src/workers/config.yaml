@@ -1,2 +1,2 @@
 ollama_api_url: "http://ollama-api:11434/api/generate"
-model_name: "llama3.2"
+model_name: "dolphin-mixtral"

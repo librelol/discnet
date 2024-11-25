@@ -24,7 +24,7 @@ def monitor_and_reply(job_id, config):
     discord_token = config.get("discord_token")
     channel_ids = config.get("channel_ids", [])  # List of channels
     ollama_api_url = os.getenv("OLLAMA_API_URL", "http://ollama-api:11434/api/generate")
-    model_name = os.getenv("MODEL_NAME", "llama3.2")
+    model_name = os.getenv("MODEL_NAME", "dolphin-mixtral")
     reply_prompt = config.get("reply_prompt", "")
     personality_prompt = config.get("personality_prompt", "")
     log_file_path = f"jobs/job_{job_id}/logs/user_messages_log.json"
@@ -121,7 +121,7 @@ def start_job():
 
         # Add fixed values for ollama_api_url and model_name
         config["ollama_api_url"] = "http://ollama-api:11434/api/generate"
-        config["model_name"] = "llama3.2"
+        config["model_name"] = "dolphin-mixtral"
 
         # Create job thread and start bot
         jobs[job_id] = {
@@ -173,7 +173,7 @@ def job_status(job_id):
 
 if __name__ == "__main__":
     try:
-        response = requests.post("http://ollama-api:11434/api/pull", json={"model": "llama3.2"})
+        response = requests.post("http://ollama-api:11434/api/pull", json={"model": "dolphin-mixtral"})
         response.raise_for_status()
         print("Model pulled successfully")
     except requests.exceptions.RequestException as e:
