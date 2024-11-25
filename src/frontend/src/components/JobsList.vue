@@ -17,6 +17,9 @@
               {{ item.status }}
             </v-chip>
           </template>
+          <template v-slot:item.actions="{ item }">
+            <v-btn color="red" @click="stopJob(item.jobId)">Stop</v-btn>
+          </template>
         </v-data-table>
       </v-card-text>
     </v-card>
@@ -38,6 +41,23 @@ export default {
         { text: 'Actions', value: 'actions', sortable: false },
       ],
     };
+  },
+  methods: {
+    async stopJob(jobId) {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/job/stop/${jobId}`, {}, {
+          headers: {
+            'x-auth-token': token,
+          },
+        });
+        console.log('Job stopped successfully:', response.data);
+        // Optionally, you can update the job status in the UI
+        this.jobs = this.jobs.map(job => job.jobId === jobId ? { ...job, status: 'stopped' } : job);
+      } catch (error) {
+        console.error('Error stopping job:', error.response.data);
+      }
+    },
   },
   async created() {
     try {
