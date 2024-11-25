@@ -171,6 +171,34 @@ def job_status(job_id):
     else:
         return jsonify({"status": f"Job {job_id} not found"}), 404
 
+# New endpoint to manually sync jobs
+@app.route("/job/sync", methods=["POST"])
+def sync_jobs():
+    """Manually sync jobs."""
+    try:
+        # Fetch jobs from main API
+        main_api_url = os.getenv("MAIN_API_URL", "http://mainapi:3000")
+        response = requests.get(f"{main_api_url}/api/job/owned")
+        response.raise_for_status()
+        main_api_jobs = response.json()
+
+        # Fetch jobs from workersapi
+        worker_jobs = [{"job_id": job_id, "username": job['username']} for job_id, job in jobs.items()]
+
+        # Find jobs that are in the main API but not in the workersapi
+        worker_job_ids = set(job['job_id'] for job in worker_jobs)
+        jobs_to_remove = [job for job in main_api_jobs if job['job_id'] not in worker_job_ids]
+
+        # Remove unsynced jobs from the main API and log them
+        for job in jobs_to_remove:
+            print(f"Removing unsynced job from main API: {job['job_id']}")
+            requests.delete(f"{main_api_url}/api/job/{job['job_id']}")
+
+        return jsonify({"status": "Jobs synced successfully"}), 200
+    except Exception as e:
+        print(f"Error syncing jobs: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
+
 if __name__ == "__main__":
     try:
         response = requests.post("http://ollama-api:11434/api/pull", json={"model": "dolphin-mixtral"})
