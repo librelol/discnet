@@ -6,6 +6,30 @@ const authMiddleware = require('../middlewares/authMiddleware');
 
 const WORKERS_API_URL = process.env.WORKERS_API_URL || 'http://workersapi:4000';
 
+// Function to sync jobs
+async function syncJobs(userId) {
+  try {
+    // Fetch jobs from workersapi
+    const workersApiResponse = await axios.get(`${WORKERS_API_URL}/job/owned/${userId}`);
+    const workerJobs = workersApiResponse.data.jobs;
+
+    // Fetch jobs from main API
+    const mainApiJobs = await Job.findAll({ where: { userId } });
+
+    // Find jobs that are in the main API but not in the workersapi
+    const workerJobIds = new Set(workerJobs.map(job => job.jobId));
+    const jobsToRemove = mainApiJobs.filter(job => !workerJobIds.has(job.jobId));
+
+    // Remove unsynced jobs from the main API and log them
+    for (const job of jobsToRemove) {
+      console.log(`Removing unsynced job from main API: ${job.jobId}`);
+      await job.destroy();
+    }
+  } catch (error) {
+    console.error('Error syncing jobs:', error);
+  }
+}
+
 router.post('/start', authMiddleware, async (req, res) => {
   try {
     const username = req.user.username; // Extract username from the authenticated user
@@ -65,6 +89,7 @@ router.get('/status/:job_id', authMiddleware, async (req, res) => {
 router.get('/owned', authMiddleware, async (req, res) => {
   try {
     console.log('Fetching jobs for user:', req.user.username); // Log the username
+    await syncJobs(req.user.id); // Sync jobs before fetching
     const jobs = await Job.findAll({ where: { userId: req.user.id } });
     console.log('Fetched jobs:', jobs); // Log the fetched jobs
     res.status(200).json(jobs);
